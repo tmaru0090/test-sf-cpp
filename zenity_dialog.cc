@@ -1,5 +1,6 @@
 #include "zenity_dialog.hh"
 #include <iterator>
+#include <sstream>
 #include <strstream>
 #include <iostream>
 #include <array>
@@ -68,7 +69,7 @@ ZenityID toZenityID<int>(int value){
 ZenityID ZDialog1(Dialog dialog,const std::variant<std::string,std::vector<std::string>> value){
 	std::string cmdName = "zenity";
 	std::string cmd = "";
-	std::ostrstream oss;
+	std::ostringstream oss;
 	oss << cmdName << " " << toDialogCmdString(dialog) << " ";
 	switch(dialog){
 		case Info: 
@@ -113,7 +114,7 @@ ZenityID ZDialog1(Dialog dialog,const std::variant<std::string,std::vector<std::
 	}
 	std::filesystem::remove(tempFile);
 	//cmd = oss.str();
-	std::cout << "ダイアログ用コマンド: " << cmd << std::endl;
+	//std::cout << "ダイアログ用コマンド: " << cmd << std::endl;
 	int cmdRes = system(cmd.c_str());
 	return toZenityID<int>(cmdRes);
 }
