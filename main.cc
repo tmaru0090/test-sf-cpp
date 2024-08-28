@@ -156,11 +156,18 @@ int main(){
 	ZenityID id;
 	sf::RenderWindow window(sf::VideoMode(640,480,32),"");
 	sf::Vector2f center(window.getSize().x/2.0f,window.getSize().y/2.0f);
+	float radius = 200.0f;
 	sf::Font font;
 	float x = 0;
 	float y = 0;
+/*
 	float menuTargetX1 = 140;
 	float menuTargetX2 = 100;
+*/ 
+	sf::Vector2f targetCenter = center;
+	float targetRadius = radius;
+	float menuTargetX1 = targetCenter.x+targetRadius;
+	float menuTargetX2 = targetCenter.x - targetRadius;
 
 	bool musicFlag = false;
 	bool endFlag = false;
@@ -186,8 +193,18 @@ int main(){
 	int zButtonPressCnt = 0;
 	gameData.playerName = "takashi";
 	gameData.playerState = -1;
-	
+	/*
 	for(int i=0;i<sizeof(menuName)/sizeof(menuName[0]);i++){
+		menu.push_back(Menu{
+			menuName[i],
+			sf::Vector2f(100,100+i*20),
+			sf::Color(100+i*2,100+i*3,100+i*4)
+		});
+	}*/
+	for(int i=0;i<sizeof(menuName)/sizeof(menuName[0]);i++){
+		float angle = 2*PI*i/5;
+		float x = center.x+radius*std::cos(angle);
+		float y = center.y+radius*std::sin(angle);
 		menu.push_back(Menu{
 			menuName[i],
 			sf::Vector2f(100,100+i*20),
