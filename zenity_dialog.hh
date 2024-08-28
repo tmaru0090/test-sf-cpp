@@ -16,6 +16,7 @@ enum Dialog{
 enum ZenityID{
 	Ok,
 	Cancel,
+	Unknown,
 };
 
 

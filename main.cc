@@ -156,7 +156,7 @@ int main(){
 	ZenityID id;
 	sf::RenderWindow window(sf::VideoMode(640,480,32),"");
 	sf::Vector2f center(window.getSize().x/2.0f,window.getSize().y/2.0f);
-	float radius = 200.0f;
+	float radius = 85.0f;
 	sf::Font font;
 	float x = 0;
 	float y = 0;
@@ -166,7 +166,7 @@ int main(){
 */ 
 	sf::Vector2f targetCenter = center;
 	float targetRadius = radius;
-	float menuTargetX1 = targetCenter.x+targetRadius;
+	float menuTargetX1 =targetCenter.x+targetRadius;
 	float menuTargetX2 = targetCenter.x - targetRadius;
 
 	bool musicFlag = false;
@@ -262,11 +262,11 @@ int main(){
 			music.play();
 		}
 		if(saveFlag){
-			id = ZDialog1(Dialog::Info,"セーブしました");
+			ZDialog1(Dialog::Info,"セーブしました");
 			saveGame("save.dat",gameData);
 		}
 		if(loadFlag){
-			id = ZDialog1(Dialog::Info,"ロードしました");
+			ZDialog1(Dialog::Info,"ロードしました");
 			loadData = loadGame("save.dat");
 		}
 		getJPosition(joystick,x,y);
@@ -292,17 +292,17 @@ int main(){
 			}
 		}
 
-		if(menuState == 0&&circleButtonPressCnt == 1){
+		if(menuState == 0&&circleButtonPressCnt == 1 || menuState == 0&&zButtonPressCnt == 1){
 			musicFlag = true;
 		}else{
 			musicFlag = false;
 		}
-                if(menuState == 1&&circleButtonPressCnt == 1){
+                if(menuState == 1&&circleButtonPressCnt == 1 || menuState == 1&&zButtonPressCnt == 1){
 			saveFlag = true;
 		}else{
 			saveFlag = false;
 		}
-		if(menuState == 2&&circleButtonPressCnt == 1){
+		if(menuState == 2&&circleButtonPressCnt == 1 || menuState == 2&&zButtonPressCnt == 1){
 			loadFlag = true;
 		}else{
 			loadFlag = false;
@@ -322,6 +322,8 @@ int main(){
 
 			text.setPosition(menu[i].pos);
 			text.setFillColor(menu[i].color);
+			float angle = atan2(menu[i].pos.y-center.y,menu[i].pos.x-center.x)*180/PI;
+			text.setRotation(angle);
 			window.draw(text);
 		}
 		text2.setString(std::string("load data: ")+loadData.playerName+std::string(" ")+std::to_string(loadData.playerState));

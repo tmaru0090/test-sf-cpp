@@ -1,10 +1,13 @@
 #include "zenity_dialog.hh"
+#include <iterator>
 #include <strstream>
 #include <iostream>
 #include <array>
 #include <cstdio>
 #include <stdexcept>
 #include <memory>
+#include <filesystem>
+#include <fstream>
 std::string exec(const char*cmd){
 	std::array<char,128>buf;
 	std::string res;
@@ -69,25 +72,16 @@ ZenityID ZDialog1(Dialog dialog,const std::variant<std::string,std::vector<std::
 	oss << cmdName << " " << toDialogCmdString(dialog) << " ";
 	switch(dialog){
 		case Info: 
-			oss << "--text=" << "'" <<  std::get<std::string>(value) << "'";
-			break;
 		case Question: 
-			oss << "--text=" << "'" <<  std::get<std::string>(value) << "'";
-			break;
 		case Error:
-			oss << "--text=" << "'" <<  std::get<std::string>(value) << "'";
-			break;
 		case Warning:
-			oss << "--text=" << "'" <<  std::get<std::string>(value) << "'";
-			break;
 		case Entry:
-			oss << "--text=" << "'" <<  std::get<std::string>(value) << "'";
-			break;
-		case FileSelection: 
-			oss << "--title=" << "'" <<  std::get<std::string>(value) << "'";
-			break;
 		case Calendar:
 			oss << "--text=" << "'" <<  std::get<std::string>(value) << "'";
+			break;
+	
+		case FileSelection: 
+			oss << "--title=" << "'" <<  std::get<std::string>(value) << "'";
 			break;
 		// 未実装
 		case List:
@@ -97,8 +91,29 @@ ZenityID ZDialog1(Dialog dialog,const std::variant<std::string,std::vector<std::
 			}*/
 			break;
 	}
-	cmd = oss.str();
-	//std::cout << cmd << std::endl;
+	// 命令文を一時ファイルに保存
+	std::filesystem::path tempDir = std::filesystem::temp_directory_path();
+	std::filesystem::path tempFile = tempDir/"tempFile.txt";
+	std::ofstream ofs(tempFile);
+	if(ofs){
+		ofs << oss.str() << std::endl;
+		ofs.close();
+	}else{
+		std::cerr << "Failed to create temp file" << std::endl;
+		return ZenityID::Unknown;
+	}
+	// 一時ファイルから命令文を取得
+	std::ifstream ifs(tempFile);
+	if(ifs){
+	       std::string content((std::istreambuf_iterator<char>(ifs)),std::istreambuf_iterator<char>());
+	       cmd = content;
+	}else {
+		std::cerr << "Failed to read temp file" << std::endl;
+		return ZenityID::Unknown;
+	}
+	std::filesystem::remove(tempFile);
+	//cmd = oss.str();
+	std::cout << "ダイアログ用コマンド: " << cmd << std::endl;
 	int cmdRes = system(cmd.c_str());
 	return toZenityID<int>(cmdRes);
 }
@@ -110,25 +125,16 @@ std::string ZDialog2(Dialog dialog,const std::variant<std::string,std::vector<st
 	oss << cmdName << " " << toDialogCmdString(dialog) << " ";
 	switch(dialog){
 		case Info: 
-			oss << "--text=" << "'" <<  std::get<std::string>(value) << "'";
-			break;
 		case Question: 
-			oss << "--text=" << "'" <<  std::get<std::string>(value) << "'";
-			break;
 		case Error:
-			oss << "--text=" << "'" <<  std::get<std::string>(value) << "'";
-			break;
 		case Warning:
-			oss << "--text=" << "'" <<  std::get<std::string>(value) << "'";
-			break;
 		case Entry:
-			oss << "--text=" << "'" <<  std::get<std::string>(value) << "'";
-			break;
-		case FileSelection: 
-			oss << "--title=" << "'" <<  std::get<std::string>(value) << "'";
-			break;
 		case Calendar:
 			oss << "--text=" << "'" <<  std::get<std::string>(value) << "'";
+			break;
+	
+		case FileSelection: 
+			oss << "--title=" << "'" <<  std::get<std::string>(value) << "'";
 			break;
 		// 未実装
 		case List:
@@ -138,6 +144,7 @@ std::string ZDialog2(Dialog dialog,const std::variant<std::string,std::vector<st
 			}*/
 			break;
 	}
+
 	cmd = oss.str();
 	//std::cout << cmd << std::endl;
 	return exec(cmd.c_str());
