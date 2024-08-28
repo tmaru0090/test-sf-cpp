@@ -149,20 +149,19 @@ int main(){
 	sol::function initialize = lua["initialize"];
 	sol::function finalize = lua["finalize"];
 	sol::function mainloop = lua["mainloop"];
-	sf::Vector2f center(window.getSize().x/2.0f,window.getSize().y/2.0f);
-	float radius = 150.0f;
-
 	int joystick = 0;
 	std::string musicPath = "";
 	musicPath= ZDialog2(Dialog::FileSelection,"音声ファイルを選択してください");
 	
 	ZenityID id;
 	sf::RenderWindow window(sf::VideoMode(640,480,32),"");
+	sf::Vector2f center(window.getSize().x/2.0f,window.getSize().y/2.0f);
 	sf::Font font;
 	float x = 0;
 	float y = 0;
 	float menuTargetX1 = 140;
 	float menuTargetX2 = 100;
+
 	bool musicFlag = false;
 	bool endFlag = false;
 	bool saveFlag = false;
@@ -187,28 +186,14 @@ int main(){
 	int zButtonPressCnt = 0;
 	gameData.playerName = "takashi";
 	gameData.playerState = -1;
-	/*
+	
 	for(int i=0;i<sizeof(menuName)/sizeof(menuName[0]);i++){
 		menu.push_back(Menu{
 			menuName[i],
 			sf::Vector2f(100,100+i*20),
-			sf::Color(100+i*2,0+i*3,0+i*4)
+			sf::Color(100+i*2,100+i*3,100+i*4)
 		});
 	}
-*/ 
-	for(int i=0;i<sizeof(menuName)/sizeof(menuName[0]);i++){
-		float angle = i*2*PI/(float)(sizeof(menuName)/sizeof(menuName[0]));
-		float x = center.x+radius*std::cos(angle);
-		float y = center.y+radius*std::sin(angle);
-		std::cout << x << std::endl;
-		std::cout << y << std::endl;
-		menu.push_back(Menu{
-			menuName[i],
-			sf::Vector2f(x,y),
-			sf::Color(100+i*2,0+i*3,0+i*4)
-		});
-	}
-	
 	int menuState = 0;
 	if(!font.loadFromFile("/usr/share/fonts/truetype/freefont/FreeSans.ttf")){
 		ZDialog1(Dialog::Error,"フォントのロードに失敗しました");
@@ -218,12 +203,6 @@ int main(){
 		ZDialog1(Dialog::Error,"音声ファイルのロードに失敗しました");
 		return -1;
 	}
-	sf::CircleShape charactor(10); 
-	charactor.setFillColor(sf::Color::Green);
-	sf::Vector2f p0(0,0);
-	sf::Vector2f p1(100,100);
-	sf::Vector2f p2(400,0);
-	float t = 0.0f;
 	initialize();
 	while(window.isOpen()){
 		sf::Event e;
@@ -235,12 +214,6 @@ int main(){
 			}
 		}
 		window.clear();
-		t+=0.01f;
-		if(t >1.0f){
-			t = 0.0f;
-		}
-		sf::Vector2f pos = bezier(t,p0,p1,p2);
-		charactor.setPosition(pos);
 		getKeyPressCnt(sf::Keyboard::Escape,&escapeButtonPressCnt);
 		getKeyPressCnt(sf::Keyboard::Z,&zButtonPressCnt);
 		getKeyPressCnt(sf::Keyboard::Up,&upButtonPressCnt);
@@ -320,6 +293,8 @@ int main(){
 
 
 		for(int i=0;i<menu.size();i++){	
+
+			sf::Text text(menu[i].name,font);
 			if(menuState == i){
 				auto xx = (menuTargetX1-menu[i].pos.x)*0.08;
 				menu[i].pos.x += xx;
@@ -327,12 +302,7 @@ int main(){
 				auto xx = (menuTargetX2-menu[i].pos.x)*0.08;
 				menu[i].pos.x += xx;
 			}
-			if(menu[i].pos.y > 800){
-				//menu[i].pos.y = menu[0].pos.y;
-				//menu[i].pos.x = menu[0].pos.x+100;
-			}
 
-			sf::Text text(menu[i].name,font);
 			text.setPosition(menu[i].pos);
 			text.setFillColor(menu[i].color);
 			window.draw(text);
