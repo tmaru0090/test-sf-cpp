@@ -121,15 +121,6 @@ SaveData loadGame(const std::string& fileName){
 	}
 	return data;
 }
-void arrangeMenuItemsCircular(std::vector<Menu>& menu,sf::Vector2f center,float radius){
-	int numItems = menu.size();
-	float angleStep = 2*PI/numItems;
-	for(int i=0;i<numItems;i++){
-		float angle = i*angleStep;
-		menu[i].pos.x = center.x+radius*std::cos(angle);
-		menu[i].pos.y = center.y+radius*std::sin(angle);
-	}
-}
 int main(){
 	sol::state lua;
 	lua.open_libraries(sol::lib::base);
@@ -193,6 +184,7 @@ int main(){
 	int zButtonPressCnt = 0;
 	gameData.playerName = "takashi";
 	gameData.playerState = -1;
+	
 	for(int i=0;i<sizeof(menuName)/sizeof(menuName[0]);i++){
 		menu.push_back(Menu{
 			menuName[i],
@@ -200,9 +192,7 @@ int main(){
 			sf::Color(100+i*2,0+i*3,0+i*4)
 		});
 	}
-	sf::Vector2f center(window.getSize().x/2.0f,window.getSize().y/2.0f);
-	float radius = 50.0f;
-	arrangeMenuItemsCircular(menu,center,radius);
+
 	int menuState = 0;
 	if(!font.loadFromFile("/usr/share/fonts/truetype/freefont/FreeSans.ttf")){
 		ZDialog1(Dialog::Error,"フォントのロードに失敗しました");
