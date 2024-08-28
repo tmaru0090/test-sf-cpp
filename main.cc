@@ -121,7 +121,8 @@ SaveData loadGame(const std::string& fileName){
 	}
 	return data;
 }
-void arrangeMenuItemsCircular(std::vector<Menu> menu,int numItems,sf::Vector2f center,float radius){
+void arrangeMenuItemsCircular(std::vector<Menu>& menu,sf::Vector2f center,float radius){
+	int numItems = menu.size();
 	float angleStep = 2*PI/numItems;
 	for(int i=0;i<numItems;i++){
 		float angle = i*angleStep;
@@ -200,8 +201,8 @@ int main(){
 		});
 	}
 	sf::Vector2f center(window.getSize().x/2.0f,window.getSize().y/2.0f);
-	float radius = 200.0f;
-	arrangeMenuItemsCircular(menu,5,center,radius);
+	float radius = 50.0f;
+	arrangeMenuItemsCircular(menu,center,radius);
 	int menuState = 0;
 	if(!font.loadFromFile("/usr/share/fonts/truetype/freefont/FreeSans.ttf")){
 		ZDialog1(Dialog::Error,"フォントのロードに失敗しました");
