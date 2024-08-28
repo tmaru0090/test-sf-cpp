@@ -1,5 +1,5 @@
 function initialize()
-	path =ZDialog2(Dialog.FileSelection,"初期化ファイルを選択してくださーい")
+	--path =ZDialog2(Dialog.FileSelection,"初期化ファイルを選択してくださーい")
 	print(path)
 end
 function finalize()

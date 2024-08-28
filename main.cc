@@ -1,3 +1,4 @@
+#include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Sleep.hpp>
 #include <SFML/System/Time.hpp>
@@ -16,8 +17,12 @@
 #include <locale>
 #include <codecvt>
 #include "sol/sol.hpp"
-
 #include <fstream>
+#include <cmath>
+const float PI = 3.14159265358979323846f;
+sf::Vector2f bezier(float t,sf::Vector2f p0,sf::Vector2f p1,sf::Vector2f p2){
+	return (1-t)*(1-t)*p0+2*(1-t)*t*p1+t*t*p2;
+}
 struct SaveData{
 	std::string playerName;
 	int playerState;
@@ -116,6 +121,14 @@ SaveData loadGame(const std::string& fileName){
 	}
 	return data;
 }
+void arrangeMenuItemsCircular(std::vector<Menu> menu,int numItems,sf::Vector2f center,float radius){
+	float angleStep = 2*PI/numItems;
+	for(int i=0;i<numItems;i++){
+		float angle = i*angleStep;
+		menu[i].pos.x = center.x+radius*std::cos(angle);
+		menu[i].pos.y = center.y+radius*std::sin(angle);
+	}
+}
 int main(){
 	sol::state lua;
 	lua.open_libraries(sol::lib::base);
@@ -176,8 +189,7 @@ int main(){
 	int leftButtonPressCnt = 0;
 	int rightButtonPressCnt = 0;
 	int escapeButtonPressCnt = 0;
-
-
+	int zButtonPressCnt = 0;
 	gameData.playerName = "takashi";
 	gameData.playerState = -1;
 	for(int i=0;i<sizeof(menuName)/sizeof(menuName[0]);i++){
@@ -187,8 +199,9 @@ int main(){
 			sf::Color(100+i*2,0+i*3,0+i*4)
 		});
 	}
-
-
+	sf::Vector2f center(window.getSize().x/2.0f,window.getSize().y/2.0f);
+	float radius = 200.0f;
+	arrangeMenuItemsCircular(menu,5,center,radius);
 	int menuState = 0;
 	if(!font.loadFromFile("/usr/share/fonts/truetype/freefont/FreeSans.ttf")){
 		ZDialog1(Dialog::Error,"フォントのロードに失敗しました");
@@ -198,6 +211,12 @@ int main(){
 		ZDialog1(Dialog::Error,"音声ファイルのロードに失敗しました");
 		return -1;
 	}
+	sf::CircleShape charactor(10); 
+	charactor.setFillColor(sf::Color::Green);
+	sf::Vector2f p0(0,0);
+	sf::Vector2f p1(100,100);
+	sf::Vector2f p2(400,0);
+	float t = 0.0f;
 	initialize();
 	while(window.isOpen()){
 		sf::Event e;
@@ -209,7 +228,14 @@ int main(){
 			}
 		}
 		window.clear();
+		t+=0.01f;
+		if(t >1.0f){
+			t = 0.0f;
+		}
+		sf::Vector2f pos = bezier(t,p0,p1,p2);
+		charactor.setPosition(pos);
 		getKeyPressCnt(sf::Keyboard::Escape,&escapeButtonPressCnt);
+		getKeyPressCnt(sf::Keyboard::Z,&zButtonPressCnt);
 		getKeyPressCnt(sf::Keyboard::Up,&upButtonPressCnt);
 		getKeyPressCnt(sf::Keyboard::Down,&downButtonPressCnt);
 		getKeyPressCnt(sf::Keyboard::Left,&leftButtonPressCnt);
@@ -223,7 +249,7 @@ int main(){
 
 
 
-		if(escapeButtonPressCnt == 1||menuState == 4&&circleButtonPressCnt == 1)  {
+		if(escapeButtonPressCnt == 1|| menuState == 4&&zButtonPressCnt == 1||menuState == 4&&circleButtonPressCnt == 1)  {
 			id = ZDialog1(Dialog::Question,"本当に終了しますか？");
 			if(id == ZenityID::Ok){
 				endFlag = true;
@@ -288,10 +314,10 @@ int main(){
 
 		for(int i=0;i<menu.size();i++){	
 			if(menuState == i){
-				auto xx = (menuTargetX1-menu[i].pos.x)*0.1;
+				auto xx = (menuTargetX1-menu[i].pos.x)*0.08;
 				menu[i].pos.x += xx;
 			}else{
-				auto xx = (menuTargetX2-menu[i].pos.x)*0.1;
+				auto xx = (menuTargetX2-menu[i].pos.x)*0.08;
 				menu[i].pos.x += xx;
 			}
 			if(menu[i].pos.y > 800){
