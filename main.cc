@@ -207,7 +207,7 @@ int main(){
 		float y = center.y+radius*std::sin(angle);
 		menu.push_back(Menu{
 			menuName[i],
-			sf::Vector2f(100,100+i*20),
+			sf::Vector2f(x,y),
 			sf::Color(100+i*2,100+i*3,100+i*4)
 		});
 	}
