@@ -149,6 +149,9 @@ int main(){
 	sol::function initialize = lua["initialize"];
 	sol::function finalize = lua["finalize"];
 	sol::function mainloop = lua["mainloop"];
+	sf::Vector2f center(window.getSize().x/2.0f,window.getSize().y/2.0f);
+	float radius = 150.0f;
+
 	int joystick = 0;
 	std::string musicPath = "";
 	musicPath= ZDialog2(Dialog::FileSelection,"音声ファイルを選択してください");
@@ -193,8 +196,6 @@ int main(){
 		});
 	}
 */ 
-	sf::Vector2f center(window.getSize().x/2.0f,window.getSize().y/2.0f);
-	float radius = 150.0f;
 	for(int i=0;i<sizeof(menuName)/sizeof(menuName[0]);i++){
 		float angle = i*2*PI/(float)(sizeof(menuName)/sizeof(menuName[0]));
 		float x = center.x+radius*std::cos(angle);
