@@ -184,7 +184,7 @@ int main(){
 	int zButtonPressCnt = 0;
 	gameData.playerName = "takashi";
 	gameData.playerState = -1;
-	
+	/*
 	for(int i=0;i<sizeof(menuName)/sizeof(menuName[0]);i++){
 		menu.push_back(Menu{
 			menuName[i],
@@ -192,7 +192,22 @@ int main(){
 			sf::Color(100+i*2,0+i*3,0+i*4)
 		});
 	}
-
+*/ 
+	sf::Vector2f center(window.getSize().x/2.0f,window.getSize().y/2.0f);
+	float radius = 150.0f;
+	for(int i=0;i<sizeof(menuName)/sizeof(menuName[0]);i++){
+		float angle = i*2*PI/(float)(sizeof(menuName)/sizeof(menuName[0]));
+		float x = center.x+radius*std::cos(angle);
+		float y = center.y+radius*std::sin(angle);
+		std::cout << x << std::endl;
+		std::cout << y << std::endl;
+		menu.push_back(Menu{
+			menuName[i],
+			sf::Vector2f(x,y),
+			sf::Color(100+i*2,0+i*3,0+i*4)
+		});
+	}
+	
 	int menuState = 0;
 	if(!font.loadFromFile("/usr/share/fonts/truetype/freefont/FreeSans.ttf")){
 		ZDialog1(Dialog::Error,"フォントのロードに失敗しました");
