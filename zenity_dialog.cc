@@ -122,7 +122,7 @@ ZenityID ZDialog1(Dialog dialog,const std::variant<std::string,std::vector<std::
 std::string ZDialog2(Dialog dialog,const std::variant<std::string,std::vector<std::string>> value){
 	std::string cmdName = "zenity";
 	std::string cmd = "";
-	std::ostrstream oss;
+	std::ostringstream oss;
 	oss << cmdName << " " << toDialogCmdString(dialog) << " ";
 	switch(dialog){
 		case Info: 
@@ -145,9 +145,31 @@ std::string ZDialog2(Dialog dialog,const std::variant<std::string,std::vector<st
 			}*/
 			break;
 	}
+	// 命令文を一時ファイルに保存
+	std::filesystem::path tempDir = std::filesystem::temp_directory_path();
+	std::filesystem::path tempFile = tempDir/"tempFile.txt";
+	std::ofstream ofs(tempFile);
+	if(ofs){
+		ofs << oss.str() << std::endl;
+		ofs.close();
+	}else{
+		std::cerr << "Failed to create temp file" << std::endl;
+		return "";
+	}
+	// 一時ファイルから命令文を取得
+	std::ifstream ifs(tempFile);
+	if(ifs){
+	       std::string content((std::istreambuf_iterator<char>(ifs)),std::istreambuf_iterator<char>());
+	       cmd = content;
+	}else {
+		std::cerr << "Failed to read temp file" << std::endl;
+		return "";
+	}
+	std::filesystem::remove(tempFile);
+	//cmd = oss.str();
+	//std::cout << "ダイアログ用コマンド: " << cmd << std::endl;
 
-	cmd = oss.str();
-	//std::cout << cmd << std::endl;
-	return exec(cmd.c_str());
+
+return exec(cmd.c_str());
 }
 
