@@ -19,6 +19,37 @@
 #include "sol/sol.hpp"
 #include <fstream>
 #include <cmath>
+#include <sys/types.h>
+template <typename Single>
+class Singleton{
+protected:
+	Singleton(){}
+public:
+	virtual ~Singleton(){}
+	Singleton& operator=(const Singleton&) = delete;
+	Singleton(Singleton&&) = delete;
+	static Single* getInstance(){
+		static Single single;
+		return &single;
+	}
+};
+class TestSingleton: public Singleton<TestSingleton>{
+public:
+	void test(){}
+};
+
+class Keyboard{
+private:
+	uint keyPressCnt,keyReleaseCnt;
+public:
+	
+};
+class Joystick{
+private:
+public:
+};
+
+
 const float PI = 3.14159265358979323846f;
 sf::Vector2f bezier(float t,sf::Vector2f p0,sf::Vector2f p1,sf::Vector2f p2){
 	return (1-t)*(1-t)*p0+2*(1-t)*t*p1+t*t*p2;
