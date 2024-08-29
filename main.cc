@@ -21,7 +21,7 @@
 #include <cmath>
 #include <sys/types.h>
 #include "singleton.hh"
-
+/*
 enum KeyType{
 	Pressd,
 	Released,
@@ -61,6 +61,44 @@ public:
 		}
 	}	
 };
+*/
+
+
+enum KeyType {
+    Pressed,
+    Released,
+};
+
+class Keyboard : public Singleton<Keyboard> {
+private:
+    uint keyPressCnt, keyReleaseCnt;
+    std::map<sf::Keyboard::Key, bool> keyState; // キーの状態を記録
+
+public:
+    Keyboard() : keyPressCnt(0), keyReleaseCnt(0) {}
+
+    uint getKeyCnt(sf::Keyboard::Key key, KeyType type) {
+        if (sf::Keyboard::isKeyPressed(key)) {
+            if (!keyState[key]) {  // もしキーが前回押されていなかったら
+                keyPressCnt++;
+                keyState[key] = true;
+            }
+        } else {
+            if (keyState[key]) {  // もしキーが前回押されていたら
+                keyReleaseCnt++;
+                keyState[key] = false;
+            }
+        }
+        return type == KeyType::Pressed ? keyPressCnt : keyReleaseCnt;
+    }
+
+    void update() {
+        // ここでキー状態をリセットする必要があれば行います
+    }
+};
+
+
+
 class Joystick{
 private:
 public:
