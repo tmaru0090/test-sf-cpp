@@ -41,17 +41,7 @@ public:
 	      }
 	      return type == KeyType::Pressd?keyPressCnt:keyReleaseCnt;
 	}
-	/*
-	uint getKeyReleaseCnt(sf::Keyboard::Key key){
-	      if(keyPressCnt == 0){
-		keyReleaseCnt++;
-	      }else {
-		keyPressCnt = 0;
-		keyReleaseCnt++;
-	      }
-	      return keyReleaseCnt;
-	}
-	*/
+	
 	void update(){
 		if(keyPressCnt < 0 ){
 			keyPressCnt = 0;
