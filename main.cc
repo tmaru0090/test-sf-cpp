@@ -20,29 +20,46 @@
 #include <fstream>
 #include <cmath>
 #include <sys/types.h>
-template <typename Single>
-class Singleton{
-protected:
-	Singleton(){}
-public:
-	virtual ~Singleton(){}
-	Singleton& operator=(const Singleton&) = delete;
-	Singleton(Singleton&&) = delete;
-	static Single* getInstance(){
-		static Single single;
-		return &single;
-	}
-};
-class TestSingleton: public Singleton<TestSingleton>{
-public:
-	void test(){}
-};
+#include "singleton.hh"
 
-class Keyboard{
+enum KeyType{
+	Pressd,
+	Released,
+};
+class Keyboard:public Singleton<Keyboard>{
 private:
 	uint keyPressCnt,keyReleaseCnt;
 public:
-	
+	Keyboard():keyPressCnt(0),keyReleaseCnt(0){}
+	uint getKeyCnt(sf::Keyboard::Key key,KeyType type){
+	      if(sf::Keyboard::isKeyPressed(key)){
+		keyPressCnt++;
+		keyReleaseCnt--;
+	      }else {
+		keyPressCnt--;
+		keyReleaseCnt++;
+	      }
+	      return type == KeyType::Pressd?keyPressCnt:keyReleaseCnt;
+	}
+	/*
+	uint getKeyReleaseCnt(sf::Keyboard::Key key){
+	      if(keyPressCnt == 0){
+		keyReleaseCnt++;
+	      }else {
+		keyPressCnt = 0;
+		keyReleaseCnt++;
+	      }
+	      return keyReleaseCnt;
+	}
+	*/
+	void update(){
+		if(keyPressCnt < 0 ){
+			keyPressCnt = 0;
+		}
+		if(keyReleaseCnt < 0){
+			keyReleaseCnt = 0;
+		}
+	}	
 };
 class Joystick{
 private:
@@ -254,6 +271,7 @@ int main(){
 	initialize();
 	while(window.isOpen()){
 		sf::Event e;
+		Keyboard::getInstance()->update();
 		sf::Joystick::update();
 		while(window.pollEvent(e)){
 			if(e.type == sf::Event::Closed){
@@ -275,9 +293,9 @@ int main(){
 		getJPressCnt(0,CustomKey::Triangle,&triangleButtonPressCnt);
 		
 
+		std::cout << "escape key pressd: " << Keyboard::getInstance()->getKeyCnt(sf::Keyboard::Escape, KeyType::Pressd) << std::endl;
 
-
-		if(escapeButtonPressCnt == 1|| menuState == 4&&zButtonPressCnt == 1||menuState == 4&&circleButtonPressCnt == 1)  {
+		if(Keyboard::getInstance()->getKeyCnt(sf::Keyboard::Escape,KeyType::Pressd) == 1|| menuState == 4&&zButtonPressCnt == 1||menuState == 4&&circleButtonPressCnt == 1)  {
 			id = ZDialog1(Dialog::Question,"本当に終了しますか？");
 			if(id == ZenityID::Ok){
 				endFlag = true;
